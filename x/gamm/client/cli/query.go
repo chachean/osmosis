@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/osmosis-labs/osmosis/x/gamm/types"
@@ -112,25 +111,21 @@ $ %s query gamm pools
 				version.AppName,
 			),
 		),
-		Args: cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-			limit, err := strconv.Atoi(args[0])
+			queryClient := types.NewQueryClient(clientCtx)
 
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.Pools(cmd.Context(), &types.QueryPoolsRequest{
-				Pagination: &query.PageRequest{
-					Key:        nil,
-					Limit:      uint64(limit),
-					CountTotal: false,
-				},
+				Pagination: pageReq,
 			})
 			if err != nil {
 				return err
@@ -141,6 +136,7 @@ $ %s query gamm pools
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "pools")
 
 	return cmd
 }
