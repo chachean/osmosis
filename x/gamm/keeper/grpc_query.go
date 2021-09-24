@@ -60,6 +60,15 @@ func (k Keeper) Pool(
 	}
 }
 
+func contains(poolIds []uint64, poolId uint64) bool {
+	for _, v := range poolIds {
+		if v == poolId {
+			return true
+		}
+	}
+	return false
+}
+
 func (k Keeper) Pools(
 	ctx context.Context,
 	req *types.QueryPoolsRequest,
@@ -72,29 +81,34 @@ func (k Keeper) Pools(
 	store := sdkCtx.KVStore(k.storeKey)
 	poolStore := prefix.NewStore(store, types.KeyPrefixPools)
 
+	poolIds := []uint64{1, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 22, 42} 
+
 	var anys []*codectypes.Any
 	pageRes, err := query.Paginate(poolStore, req.Pagination, func(_, value []byte) error {
 		poolI, err := k.UnmarshalPool(value)
 		if err != nil {
 			return err
 		}
+		
+		flag := contains(poolIds, poolI.GetId())
+		if flag {
+			// Use GetPool function because it runs PokeWeights
+			poolI, err = k.GetPool(sdkCtx, poolI.GetId())
+			if err != nil {
+				return err
+			}
 
-		// Use GetPool function because it runs PokeWeights
-		poolI, err = k.GetPool(sdkCtx, poolI.GetId())
-		if err != nil {
-			return err
-		}
+			pool, ok := poolI.(*types.Pool)
+			if !ok {
+				return fmt.Errorf("pool (%d) is not basic pool", pool.GetId())
+			}
 
-		pool, ok := poolI.(*types.Pool)
-		if !ok {
-			return fmt.Errorf("pool (%d) is not basic pool", pool.GetId())
+			any, err := codectypes.NewAnyWithValue(pool)
+			if err != nil {
+				return err
+			}
+			anys = append(anys, any)
 		}
-
-		any, err := codectypes.NewAnyWithValue(pool)
-		if err != nil {
-			return err
-		}
-		anys = append(anys, any)
 		return nil
 	})
 
