@@ -81,7 +81,7 @@ func (k Keeper) Pools(
 	store := sdkCtx.KVStore(k.storeKey)
 	poolStore := prefix.NewStore(store, types.KeyPrefixPools)
 
-	poolIds := []uint64{1, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 22, 42, 183, 197, 462, 472} 
+	poolIds := []uint64{1, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15, 22, 42, 183, 197, 481, 482} 
 
 	var anys []*codectypes.Any
 	pageRes, err := query.Paginate(poolStore, req.Pagination, func(_, value []byte) error {
