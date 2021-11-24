@@ -33,10 +33,24 @@ Ref: https://keepachangelog.com/en/1.0.0/
 -->
 
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v4.2.0]
+
+* [\#561](https://github.com/osmosis-labs/osmosis/pull/561) Significantly lower I/O usage at epoch.
+* [\#556](https://github.com/osmosis-labs/osmosis/pull/556) Add IBC mempool filter to prevent redundant IBC transfers from entering your mempool
+* Add a mempool filter to only include txs that take under 25M gas
+* [\#529](https://github.com/osmosis-labs/osmosis/pull/529) Upgrade to Tendermint v0.34.14
+  * Includes postgres indexer for events
+
+## [v4.1.0]
+
+* Significantly reduce epoch load and events
+* Fix bug in epoch distribution events, used to use raw address, now uses bech32 addr
 
 ## [v4.0.0]
 
