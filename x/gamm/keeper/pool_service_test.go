@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/osmosis-labs/osmosis/x/gamm/types"
 )
@@ -255,16 +256,12 @@ func (suite *KeeperTestSuite) TestCreatePool() {
 
 		// Mint some assets to the accounts.
 		for _, acc := range []sdk.AccAddress{acc1, acc2, acc3} {
-			err := suite.app.BankKeeper.AddCoins(
-				suite.ctx,
-				acc,
-				sdk.NewCoins(
-					sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
-					sdk.NewCoin("foo", sdk.NewInt(10000000)),
-					sdk.NewCoin("bar", sdk.NewInt(10000000)),
-					sdk.NewCoin("baz", sdk.NewInt(10000000)),
-				),
-			)
+			err := simapp.FundAccount(suite.app.BankKeeper, suite.ctx, acc, sdk.NewCoins(
+				sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
+				sdk.NewCoin("foo", sdk.NewInt(10000000)),
+				sdk.NewCoin("bar", sdk.NewInt(10000000)),
+				sdk.NewCoin("baz", sdk.NewInt(10000000)),
+			))
 			if err != nil {
 				panic(err)
 			}
@@ -343,16 +340,12 @@ func (suite *KeeperTestSuite) TestJoinPool() {
 
 		// Mint some assets to the accounts.
 		for _, acc := range []sdk.AccAddress{acc1, acc2, acc3} {
-			err := suite.app.BankKeeper.AddCoins(
-				suite.ctx,
-				acc,
-				sdk.NewCoins(
-					sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
-					sdk.NewCoin("foo", sdk.NewInt(10000000)),
-					sdk.NewCoin("bar", sdk.NewInt(10000000)),
-					sdk.NewCoin("baz", sdk.NewInt(10000000)),
-				),
-			)
+			err := simapp.FundAccount(suite.app.BankKeeper, suite.ctx, acc, sdk.NewCoins(
+				sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
+				sdk.NewCoin("foo", sdk.NewInt(10000000)),
+				sdk.NewCoin("bar", sdk.NewInt(10000000)),
+				sdk.NewCoin("baz", sdk.NewInt(10000000)),
+			))
 			if err != nil {
 				panic(err)
 			}
@@ -452,16 +445,12 @@ func (suite *KeeperTestSuite) TestExitPool() {
 
 		// Mint some assets to the accounts.
 		for _, acc := range []sdk.AccAddress{acc1, acc2, acc3} {
-			err := suite.app.BankKeeper.AddCoins(
-				suite.ctx,
-				acc,
-				sdk.NewCoins(
-					sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
-					sdk.NewCoin("foo", sdk.NewInt(10000000)),
-					sdk.NewCoin("bar", sdk.NewInt(10000000)),
-					sdk.NewCoin("baz", sdk.NewInt(10000000)),
-				),
-			)
+			err := simapp.FundAccount(suite.app.BankKeeper, suite.ctx, acc, sdk.NewCoins(
+				sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
+				sdk.NewCoin("foo", sdk.NewInt(10000000)),
+				sdk.NewCoin("bar", sdk.NewInt(10000000)),
+				sdk.NewCoin("baz", sdk.NewInt(10000000)),
+			))
 			if err != nil {
 				panic(err)
 			}
@@ -500,16 +489,12 @@ func (suite *KeeperTestSuite) TestActivePool() {
 
 		// Mint some assets to the accounts.
 		for _, acc := range []sdk.AccAddress{acc1, acc2, acc3} {
-			err := suite.app.BankKeeper.AddCoins(
-				suite.ctx,
-				acc,
-				sdk.NewCoins(
-					sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
-					sdk.NewCoin("foo", sdk.NewInt(10000000)),
-					sdk.NewCoin("bar", sdk.NewInt(10000000)),
-					sdk.NewCoin("baz", sdk.NewInt(10000000)),
-				),
-			)
+			err := simapp.FundAccount(suite.app.BankKeeper, suite.ctx, acc, sdk.NewCoins(
+				sdk.NewCoin("uosmo", sdk.NewInt(10000000000)),
+				sdk.NewCoin("foo", sdk.NewInt(10000000)),
+				sdk.NewCoin("bar", sdk.NewInt(10000000)),
+				sdk.NewCoin("baz", sdk.NewInt(10000000)),
+			))
 			if err != nil {
 				panic(err)
 			}

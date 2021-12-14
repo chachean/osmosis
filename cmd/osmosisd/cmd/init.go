@@ -76,7 +76,7 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			cdc := clientCtx.JSONMarshaler
+			cdc := clientCtx.Codec
 
 			serverCtx := server.GetServerContextFromCmd(cmd)
 			config := serverCtx.Config
@@ -104,13 +104,12 @@ func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
 			appConfig.API.Enable = true
 			appConfig.StateSync.SnapshotInterval = 1500
 			appConfig.StateSync.SnapshotKeepRecent = 2
+			appConfig.MinGasPrices = "0uosmo"
 
 			chainID, _ := cmd.Flags().GetString(flags.FlagChainID)
 			if chainID == "" {
 				chainID = fmt.Sprintf("test-chain-%v", tmrand.Str(6))
 			}
-
-			fmt.Println("help")
 
 			// Get bip39 mnemonic
 			var mnemonic string

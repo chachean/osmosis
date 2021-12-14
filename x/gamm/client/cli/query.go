@@ -76,7 +76,10 @@ $ %s query gamm pool 1
 
 			if clientCtx.OutputFormat == "text" {
 				var pool types.Pool
-				pool.XXX_Unmarshal(res.GetPool().Value)
+				err := pool.XXX_Unmarshal(res.GetPool().Value)
+				if err != nil {
+					return err
+				}
 				out, err := yaml.Marshal(pool)
 
 				if err != nil {
@@ -84,7 +87,7 @@ $ %s query gamm pool 1
 				}
 				return writeOutputBoilerplate(clientCtx, out)
 			} else {
-				out, err := clientCtx.JSONMarshaler.MarshalJSON(res)
+				out, err := clientCtx.Codec.MarshalJSON(res)
 
 				if err != nil {
 					return err
@@ -221,7 +224,7 @@ $ %s query gamm pool-params 1
 				}
 				return writeOutputBoilerplate(clientCtx, out)
 			} else {
-				out, err := clientCtx.JSONMarshaler.MarshalJSON(res)
+				out, err := clientCtx.Codec.MarshalJSON(res)
 
 				if err != nil {
 					return err

@@ -93,8 +93,14 @@ func (k Keeper) SetGaugeWithRefKey(ctx sdk.Context, gauge *types.Gauge) error {
 		if err := k.addGaugeRefByKey(ctx, combineKeys(types.KeyPrefixUpcomingGauges, timeKey), gauge.Id); err != nil {
 			return err
 		}
+		if err := k.addGaugeIDForDenom(ctx, gauge.Id, gauge.DistributeTo.Denom); err != nil {
+			return err
+		}
 	} else if gauge.IsActiveGauge(curTime) {
 		if err := k.addGaugeRefByKey(ctx, combineKeys(types.KeyPrefixActiveGauges, timeKey), gauge.Id); err != nil {
+			return err
+		}
+		if err := k.addGaugeIDForDenom(ctx, gauge.Id, gauge.DistributeTo.Denom); err != nil {
 			return err
 		}
 	} else {
@@ -190,7 +196,6 @@ func (k Keeper) BeginDistribution(ctx sdk.Context, gauge types.Gauge) error {
 	if err := k.addGaugeRefByKey(ctx, combineKeys(types.KeyPrefixActiveGauges, timeKey), gauge.Id); err != nil {
 		return err
 	}
-	k.hooks.AfterStartDistribution(ctx, gauge.Id)
 	return nil
 }
 
@@ -404,7 +409,9 @@ func (k Keeper) distributeInternal(
 	// increase filled epochs after distribution
 	gauge.FilledEpochs += 1
 	gauge.DistributedCoins = gauge.DistributedCoins.Add(totalDistrCoins...)
-	k.setGauge(ctx, &gauge)
+	if err := k.setGauge(ctx, &gauge); err != nil {
+		return nil, err
+	}
 
 	return totalDistrCoins, nil
 }
@@ -465,18 +472,15 @@ func (k Keeper) GetGaugeByID(ctx sdk.Context, gaugeID uint64) (*types.Gauge, err
 		return nil, fmt.Errorf("gauge with ID %d does not exist", gaugeID)
 	}
 	bz := store.Get(gaugeKey)
-	proto.Unmarshal(bz, &gauge)
+	if err := proto.Unmarshal(bz, &gauge); err != nil {
+		return nil, err
+	}
 	return &gauge, nil
 }
 
 // GetGaugeFromIDs returns gauges from gauge ids reference
-func (k Keeper) GetGaugeFromIDs(ctx sdk.Context, refValue []byte) ([]types.Gauge, error) {
+func (k Keeper) GetGaugeFromIDs(ctx sdk.Context, gaugeIDs []uint64) ([]types.Gauge, error) {
 	gauges := []types.Gauge{}
-	gaugeIDs := []uint64{}
-	err := json.Unmarshal(refValue, &gaugeIDs)
-	if err != nil {
-		return gauges, err
-	}
 	for _, gaugeID := range gaugeIDs {
 		gauge, err := k.GetGaugeByID(ctx, gaugeID)
 		if err != nil {
@@ -529,7 +533,7 @@ func (k Keeper) GetRewardsEst(ctx sdk.Context, addr sdk.AccAddress, locks []lock
 	}
 	gauges := []types.Gauge{}
 	// initialize gauges to active and upcomings if not set
-	for s, _ := range denomSet {
+	for s := range denomSet {
 		gaugeIDs := k.getAllGaugeIDsByDenom(ctx, s)
 		// Each gauge only rewards locks to one denom, so no duplicates
 		for _, id := range gaugeIDs {
